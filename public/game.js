@@ -26,7 +26,8 @@ let game = {
   bullets: [],
   gameOver: false,
   victory: false,
-  exitOpened: false
+  exitOpened: false,
+  shopOpen: false
 };
 
 class Player {
@@ -35,13 +36,19 @@ class Player {
     this.y = y;
     this.width = TILE_SIZE - 8;
     this.height = TILE_SIZE - 8;
+    this.baseSpeed = 4;
     this.speed = 4;
     this.direction = DIRECTIONS.RIGHT;
     this.lastFired = 0;
     this.cooldown = 300;
+    this.weapon = 'pistol';
+    this.doubleShot = false;
+    this.speedLevel = 0;
   }
 
   update(keys) {
+    if (game.shopOpen) return;
+    
     let dx = 0, dy = 0;
 
     if (keys['ArrowUp'] || keys['w'] || keys['W']) dy = -this.speed;
@@ -101,13 +108,38 @@ class Player {
 
   shoot() {
     const now = Date.now();
-    if (now - this.lastFired < this.cooldown) return;
+    let cooldown = this.cooldown;
+    
+    if (this.weapon === 'rifle') cooldown = 150;
+    if (this.weapon === 'shotgun') cooldown = 500;
+    
+    if (now - this.lastFired < cooldown) return;
     this.lastFired = now;
 
     const bulletX = this.x + TILE_SIZE / 2;
     const bulletY = this.y + TILE_SIZE / 2;
 
-    game.bullets.push(new Bullet(bulletX, bulletY, this.direction));
+    if (this.weapon === 'shotgun') {
+      const dirs = [
+        this.direction,
+        { x: this.direction.x * 0.7 + this.direction.y * 0.7, y: this.direction.y * 0.7 - this.direction.x * 0.7 },
+        { x: this.direction.x * 0.7 - this.direction.y * 0.7, y: this.direction.y * 0.7 + this.direction.x * 0.7 }
+      ];
+      dirs.forEach((dir, i) => {
+        setTimeout(() => {
+          game.bullets.push(new Bullet(bulletX, bulletY, dir, this.weapon));
+        }, i * 50);
+      });
+    } else if (this.doubleShot) {
+      const offset = this.direction === DIRECTIONS.UP || this.direction === DIRECTIONS.DOWN ? 10 : 0;
+      const perpX = this.direction === DIRECTIONS.UP || this.direction === DIRECTIONS.DOWN ? 1 : 0;
+      const perpY = this.direction === DIRECTIONS.LEFT || this.direction === DIRECTIONS.RIGHT ? 1 : 0;
+      
+      game.bullets.push(new Bullet(bulletX - offset * perpX - 10 * perpX, bulletY - offset * perpY - 10 * perpY, this.direction, this.weapon));
+      game.bullets.push(new Bullet(bulletX + offset * perpX + 10 * perpX, bulletY + offset * perpY + 10 * perpY, this.direction, this.weapon));
+    } else {
+      game.bullets.push(new Bullet(bulletX, bulletY, this.direction, this.weapon));
+    }
   }
 
   draw() {
@@ -133,12 +165,13 @@ class Player {
 }
 
 class Bullet {
-  constructor(x, y, direction) {
+  constructor(x, y, direction, weapon = 'pistol') {
     this.x = x;
     this.y = y;
     this.direction = direction;
-    this.speed = 8;
-    this.radius = 4;
+    this.weapon = weapon;
+    this.speed = weapon === 'rifle' ? 12 : 8;
+    this.radius = weapon === 'shotgun' ? 5 : 4;
     this.active = true;
   }
 
@@ -171,7 +204,13 @@ class Bullet {
   draw() {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = '#f9ed69';
+    if (this.weapon === 'rifle') {
+      ctx.fillStyle = '#00cec9';
+    } else if (this.weapon === 'shotgun') {
+      ctx.fillStyle = '#fd79a8';
+    } else {
+      ctx.fillStyle = '#f9ed69';
+    }
     ctx.fill();
     ctx.closePath();
   }
@@ -353,13 +392,18 @@ function nextLevel() {
   initGame();
 }
 
-function initGame() {
+function initGame(resetUpgrades = false) {
   generateMap();
-  game.player = new Player(TILE_SIZE, TILE_SIZE);
+  
+  if (resetUpgrades || !game.player) {
+    game.player = new Player(TILE_SIZE, TILE_SIZE);
+  }
+  
   game.bullets = [];
   game.gameOver = false;
   game.victory = false;
   game.exitOpened = false;
+  game.shopOpen = false;
 
   spawnEnemies();
   spawnExit();
@@ -420,7 +464,7 @@ function drawMap() {
 }
 
 function update() {
-  if (game.gameOver) return;
+  if (game.gameOver || game.shopOpen) return;
 
   game.player.update(keys);
 
@@ -505,17 +549,88 @@ document.addEventListener('keydown', (e) => {
   if (e.key === ' ' || e.key === 'Spacebar') {
     e.preventDefault();
   }
+  if ((e.key === 't' || e.key === 'T') && !game.gameOver) {
+    toggleShop();
+  }
+  if (e.key === 'Escape' && game.shopOpen) {
+    closeShop();
+  }
 });
 
 document.addEventListener('keyup', (e) => {
   keys[e.key] = false;
 });
 
+function toggleShop() {
+  game.shopOpen = !game.shopOpen;
+  const shop = document.getElementById('shop');
+  if (game.shopOpen) {
+    shop.classList.remove('hidden');
+    updateShopUI();
+  } else {
+    shop.classList.add('hidden');
+  }
+}
+
+function closeShop() {
+  game.shopOpen = false;
+  document.getElementById('shop').classList.add('hidden');
+}
+
+function updateShopUI() {
+  document.getElementById('shopScore').textContent = game.score;
+  const buttons = document.querySelectorAll('.buy-btn');
+  buttons.forEach(btn => {
+    const price = parseInt(btn.dataset.price);
+    btn.disabled = game.score < price;
+  });
+}
+
+function buyItem(item) {
+  const prices = {
+    speed: 200,
+    doubleShot: 300,
+    rifle: 400,
+    shotgun: 600
+  };
+  
+  const price = prices[item];
+  if (game.score < price) return;
+  
+  if (item === 'speed') {
+    if (game.player.speedLevel >= 3) return;
+    game.player.speedLevel++;
+    game.player.speed = game.player.baseSpeed + game.player.speedLevel * 1.5;
+    game.score -= price;
+  } else if (item === 'doubleShot') {
+    if (game.player.doubleShot) return;
+    game.player.doubleShot = true;
+    game.score -= price;
+  } else if (item === 'rifle') {
+    if (game.player.weapon === 'rifle' || game.player.weapon === 'shotgun') return;
+    game.player.weapon = 'rifle';
+    game.score -= price;
+  } else if (item === 'shotgun') {
+    if (game.player.weapon === 'shotgun') return;
+    game.player.weapon = 'shotgun';
+    game.score -= price;
+  }
+  
+  updateUI();
+  updateShopUI();
+}
+
+document.querySelectorAll('.buy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    buyItem(btn.closest('.shop-item').dataset.item);
+  });
+});
+
 document.getElementById('restartBtn').addEventListener('click', () => {
   document.getElementById('gameOver').classList.add('hidden');
   game.level = 1;
   game.score = 0;
-  initGame();
+  initGame(true);
 });
 
 initGame();

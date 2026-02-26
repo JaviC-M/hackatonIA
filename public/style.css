@@ -101,3 +101,79 @@ button:hover {
   transform: scale(1.05);
   background: #45b390;
 }
+
+.shop-content {
+  max-width: 500px;
+  padding: 25px;
+}
+
+.shop-balance {
+  color: #f9ed69;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.shop-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  background: #16213e;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #4ecca3;
+}
+
+.item-icon {
+  font-size: 28px;
+  margin-right: 12px;
+}
+
+.item-info {
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  color: #4ecca3;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.item-desc {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.item-price {
+  color: #f9ed69;
+  font-size: 14px;
+}
+
+.buy-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  background: #e94560;
+}
+
+.buy-btn:hover {
+  background: #c73e54;
+}
+
+.buy-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.shop-hint {
+  color: #777;
+  font-size: 14px;
+}

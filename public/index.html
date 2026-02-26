@@ -16,7 +16,52 @@
     </div>
     <canvas id="gameCanvas" width="624" height="528"></canvas>
     <div class="controls">
-      <p><strong>Controles:</strong> WASD o Flechas para mover | ESPACIO para disparar</p>
+      <p><strong>Controles:</strong> WASD/Flechas: mover | ESPACIO: disparar | T: tienda</p>
+    </div>
+    <div id="shop" class="modal hidden">
+      <div class="modal-content shop-content">
+        <h2>🛒 TIENDA</h2>
+        <p class="shop-balance">Puntos: <span id="shopScore">0</span></p>
+        <div class="shop-items">
+          <div class="shop-item" data-item="speed">
+            <div class="item-icon">👟</div>
+            <div class="item-info">
+              <span class="item-name">+ Velocidad</span>
+              <span class="item-desc">Muévete más rápido</span>
+              <span class="item-price">200 pts</span>
+            </div>
+            <button class="buy-btn" data-price="200">Comprar</button>
+          </div>
+          <div class="shop-item" data-item="doubleShot">
+            <div class="item-icon">🔫</div>
+            <div class="item-info">
+              <span class="item-name">Doble Disparo</span>
+              <span class="item-desc">Dispara 2 balas a la vez</span>
+              <span class="item-price">300 pts</span>
+            </div>
+            <button class="buy-btn" data-price="300">Comprar</button>
+          </div>
+          <div class="shop-item" data-item="rifle">
+            <div class="item-icon">🔫</div>
+            <div class="item-info">
+              <span class="item-name">Rifle Automático</span>
+              <span class="item-desc">Dispara más rápido</span>
+              <span class="item-price">400 pts</span>
+            </div>
+            <button class="buy-btn" data-price="400">Comprar</button>
+          </div>
+          <div class="shop-item" data-item="shotgun">
+            <div class="item-icon">💥</div>
+            <div class="item-info">
+              <span class="item-name">Escopeta</span>
+              <span class="item-desc">3 balas en arco</span>
+              <span class="item-price">600 pts</span>
+            </div>
+            <button class="buy-btn" data-price="600">Comprar</button>
+          </div>
+        </div>
+        <p class="shop-hint">Presiona T o ESC para cerrar</p>
+      </div>
     </div>
     <div id="gameOver" class="modal hidden">
       <div class="modal-content">

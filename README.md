@@ -102,7 +102,7 @@ npm install
 npm start
 ```
 
-Luego abre tu navegador en: **http://localhost:3000**
+Luego abre tu navegador en: **http://localhost:8080**
 
 ### Controles
 
