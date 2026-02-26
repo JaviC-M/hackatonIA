@@ -2,7 +2,7 @@
 
 **Session ID:** ses_366e18ce7ffeqUaDU1eO0HLQK4
 **Created:** 2/26/2026, 9:43:55 AM
-**Updated:** 2/26/2026, 10:04:13 AM
+**Updated:** 2/26/2026, 10:20:08 AM
 
 ---
 
@@ -429,6 +429,173 @@ Tool: edit
 ## Assistant
 
 Arreglado. Ahora todos los disparos rompen los bloques naranjas. Refresca la página (http://localhost:3000) y prueba.
+
+---
+
+## User
+
+Vale, el proyecto esta muy bien con las mejoras, ahora quiero añadirle algo de dificultad a los enemigos ya que se hace muy sencillo con mejoras o incluso sin ellas, modificame los enemigos para que haya diferentes tipos de monstruos y que cada uno tenga alguna habilidad especial
+
+---
+
+## Assistant
+
+```
+Tool: read
+```
+
+---
+
+## Assistant
+
+```
+Tool: edit
+```
+
+---
+
+## Assistant
+
+```
+Tool: read
+```
+
+---
+
+## Assistant
+
+```
+Tool: edit
+```
+
+---
+
+## Assistant
+
+```
+Tool: grep
+```
+
+---
+
+## Assistant
+
+```
+Tool: read
+```
+
+---
+
+## Assistant
+
+```
+Tool: edit
+```
+
+---
+
+## Assistant
+
+```
+Tool: grep
+```
+
+---
+
+## Assistant
+
+```
+Tool: read
+```
+
+---
+
+## Assistant
+
+```
+Tool: edit
+```
+
+---
+
+## Assistant
+
+```
+Tool: grep
+```
+
+---
+
+## Assistant
+
+```
+Tool: read
+```
+
+---
+
+## Assistant
+
+```
+Tool: edit
+```
+
+---
+
+## Assistant
+
+```
+Tool: grep
+```
+
+---
+
+## Assistant
+
+```
+Tool: read
+```
+
+---
+
+## Assistant
+
+```
+Tool: edit
+```
+
+---
+
+## Assistant
+
+```
+Tool: bash
+```
+
+---
+
+## Assistant
+
+```
+Tool: bash
+```
+
+---
+
+## Assistant
+
+Listo. Ahora hay 6 tipos de enemigos que aparecen según el nivel:
+
+| Tipo | Color | Habilidad | Aparece en nivel |
+|------|-------|-----------|------------------|
+| **Básico** | Rojo | Movimiento aleatorio | Nivel 1+ |
+| **Rápido** | Amarillo | Se mueve más rápido | Nivel 2+ |
+| **Cazador** | Morado | Persigue al jugador | Nivel 3+ |
+| **Teletransportador** | Azul | Se teletransporta aleatoriamente | Nivel 4+ |
+| **Fantasma** | Cyan | Atraviesa ladrillos (no paredes) | Nivel 5+ |
+| **Tirador** | Naranja | Dispara proyectiles al jugador | Nivel 6+ |
+
+Refresca http://localhost:3000 y prueba.
 
 ---
 
