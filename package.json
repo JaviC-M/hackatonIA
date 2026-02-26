@@ -1,0 +1,13 @@
+{
+  "name": "bomberman-gun-edition",
+  "version": "1.0.0",
+  "description": "Bomberman Gun Edition - Juego estilo Bomberman con pistola",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

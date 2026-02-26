@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bomberman: Gun Edition</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container">
+    <h1>💥🔫 Bomberman: Gun Edition</h1>
+    <div class="game-info">
+      <span id="level">Nivel: 1</span>
+      <span id="enemies">Enemigos: 0</span>
+      <span id="score">Puntos: 0</span>
+    </div>
+    <canvas id="gameCanvas" width="624" height="528"></canvas>
+    <div class="controls">
+      <p><strong>Controles:</strong> WASD o Flechas para mover | ESPACIO para disparar</p>
+    </div>
+    <div id="gameOver" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="gameOverTitle">¡Game Over!</h2>
+        <p id="gameOverMessage"></p>
+        <button id="restartBtn">Reiniciar</button>
+      </div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

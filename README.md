@@ -83,7 +83,50 @@ El objetivo principal del proyecto es:
 
 ## 🛠️ Tecnologías utilizadas
 
-*(Aquí puedes añadir el lenguaje y herramientas que hayas usado, por ejemplo: Java, C++, Python, Unity, etc.)*
+- **Frontend**: HTML5 Canvas, JavaScript vanilla
+- **Backend**: Node.js, Express
+
+---
+
+## 🚀 Cómo jugar
+
+### Instalación
+
+```bash
+npm install
+```
+
+### Ejecutar el juego
+
+```bash
+npm start
+```
+
+Luego abre tu navegador en: **http://localhost:3000**
+
+### Controles
+
+| Tecla | Acción |
+|-------|--------|
+| W / ↑ | Moverse arriba |
+| S / ↓ | Moverse abajo |
+| A / ← | Moverse a la izquierda |
+| D / → | Moverse a la derecha |
+| ESPACIO | Disparar |
+
+### Mecánicas del juego
+
+- **Jugador (verde)**: Eres tú. Muévete por el mapa y dispara.
+- **Enemigos (rojos)**: Elimínalos con tus disparos. Si te tocan, pierdes.
+- **Bloques grises**: Indestructibles. No puedes atravesarlos.
+- **Bloques naranjas**: Destructibles. Destrúyelos con tus disparos.
+- **Puerta 🚪**: Aparece cuando eliminas todos los enemigos. Pasa por ella para avanzar de nivel.
+
+### Puntuación
+
+- Destruir un bloque: **+10 puntos**
+- Eliminar un enemigo: **+50 puntos**
+- Completar un nivel: **+100 × nivel puntos**
 
 ---
 
