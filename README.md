@@ -102,7 +102,7 @@ npm install
 npm start
 ```
 
-Luego abre tu navegador en: **http://localhost:8080**
+Luego abre tu navegador en: **http://localhost:3000**
 
 ### Controles
 
@@ -117,10 +117,21 @@ Luego abre tu navegador en: **http://localhost:8080**
 ### Mecánicas del juego
 
 - **Jugador (verde)**: Eres tú. Muévete por el mapa y dispara.
-- **Enemigos (rojos)**: Elimínalos con tus disparos. Si te tocan, pierdes.
+- **Enemigos**: Hay diferentes tipos, cada uno con habilidades únicas.
 - **Bloques grises**: Indestructibles. No puedes atravesarlos.
 - **Bloques naranjas**: Destructibles. Destrúyelos con tus disparos.
 - **Puerta 🚪**: Aparece cuando eliminas todos los enemigos. Pasa por ella para avanzar de nivel.
+
+### Tipos de enemigos
+
+| Tipo | Color | Habilidad | Aparece en nivel |
+|------|-------|-----------|------------------|
+| **Básico** | Rojo | Movimiento aleatorio | Nivel 1+ |
+| **Rápido** | Amarillo | Se mueve más rápido | Nivel 2+ |
+| **Cazador** | Morado | Persigue al jugador | Nivel 3+ |
+| **Teletransportador** | Azul | Se teletransporta aleatoriamente | Nivel 4+ |
+| **Fantasma** | Cyan | Atraviesa ladrillos (no paredes) | Nivel 5+ |
+| **Tirador** | Naranja | Dispara proyectiles al jugador | Nivel 6+ |
 
 ### Puntuación
 
