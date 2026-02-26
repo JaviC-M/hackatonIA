@@ -1,58 +1,95 @@
-# Hackaton IA
+# 💥🔫 Bomberman: Gun Edition
 
-Conocer como puedes usar **LLMs** para crear y resolver problemas es una habilidad cada vez más importante.
+## 📌 Descripción del proyecto
 
-Aunque a dia de hoy aun no tenemos herramientas de este tipo que sean capaces de sustituir 100% a un profesional, cada vez nos permiten hacer y extender nuestras capacidades.
+Este proyecto es una versión modificada del clásico juego **Bomberman**, inspirada en el título original desarrollado por **Hudson Soft** y popularizado por franquicias como *Bomberman*.  
 
-En esta prueba crearás una aplicación, pero no podrás escribir nada manualmente. Solo podrás usar herramientas de IA para crearla.
+La principal diferencia es un cambio significativo en la mecánica principal:  
+👉 En lugar de colocar bombas, el personaje utiliza una **pistola** para disparar y eliminar obstáculos y enemigos.
 
-## Formato de entrega
+El objetivo del juego sigue siendo similar al original: eliminar a todos los enemigos del mapa y encontrar la salida para avanzar al siguiente nivel, pero ahora la estrategia cambia completamente al introducir disparos en tiempo real en vez de explosiones con temporizador.
 
-El proyecto será entregado en un proyecto de `Github` público, con un historial de commits claro y detallado, y un `README.md` que explique cómo usar la herramienta o aplicación, incluyendo instrucciones de instalación, uso y cualquier detalle relevante sobre el proyecto.
+---
 
-> Sin un historial claro de commits, o una documentación clara, el proyecto no será valorado. No tengas visión de tunel mientras usas las herramientas y documenta cada paso que se ha dado para llegar al resultado final.
+## 🎮 ¿Qué hace el proyecto?
 
-## Reglas
+El juego permite:
 
-1. No puedes escribir código manualmente. Salvo pequeñas correcciones, todo debe ser generado.
-2. Puedes usar cualquier herramienta de IA que quieras, pero debes documentar el proceso. `Opencode` facilita mucho esto, tiene opcion de exportar todo el proceso a un markdown, pero si usas otras herramientas, añadelo manualmente. Si esto no se cumple, el proyecto no será valorado.
-3. El proyecto debe ser funcional, es decir, debe ser capaz de hacer lo que se supone que debe hacer.
-4. En el proyecto se podrán valorar según diferentes criterios, como la creatividad, utilidad, complejidad, etc. Buscando siempre que favorezca al proyecto según su naturaleza.
-5. Tener un historial de commits claro y detallado, que muestre el proceso de desarrollo y las decisiones tomadas. Sin esto, el proyecto no será valorado.
-6. El proyecto debe ser presentado junto a un `README.md` que explique cómo usar la herramienta o aplicación, incluyendo instrucciones de instalación, uso y cualquier detalle relevante sobre el proyecto. Si las instrucciones no son claras o al seguirlas no se ejecuta correctamente, el proyecto no será valorado.
+- Controlar a un personaje dentro de un mapa con obstáculos.
+- Moverse en cuatro direcciones.
+- Disparar proyectiles en la dirección en la que está mirando.
+- Destruir ciertos bloques del escenario.
+- Eliminar enemigos mediante disparos.
+- Superar niveles al cumplir las condiciones de victoria.
+- Perder la partida si un enemigo alcanza al jugador.
 
-## Sobre el proyecto
+---
 
-1. No hay un tema específico, ni tecnología concreta, ni un problema concreto a resolver.
-2. Puede ser una aplicación web, de escritorio, terminal, un script, libreria, análisis de datos, etc.
-3. No necesitas resolver un problema real, pero si es recomendable que el proyecto tenga un objetivo claro.
-4. La creatividad puede suplir la falta de utilidad, pero no al revés, es decir, un proyecto con poca utilidad pero muy creativo puede ser mejor valorado que un proyecto con mucha utilidad pero que ya existe y está muy extendido.
-5. No es necesario que el proyecto sea un producto terminado, pero si que sea funcional y demuestre que sabes utilizar herramientas generativas para crear algo nuevo.
+## 🔄 Cambios significativos respecto al Bomberman original
 
-## Antes de empezar
+| Bomberman clásico | Bomberman: Gun Edition |
+|-------------------|------------------------|
+| Se colocan bombas con temporizador | Se dispara una pistola al instante |
+| Las bombas explotan en cruz | Los disparos viajan en línea recta |
+| Estrategia basada en posicionamiento y tiempo | Estrategia basada en reflejos y puntería |
+| Riesgo de autoexplosión | Riesgo de quedarse sin cobertura |
 
-Comienza por crear un `README.md` donde definas, con detalle, que hace tu proyecto.
+Estos cambios hacen que el juego pase de ser más táctico y estratégico a ser más dinámico y orientado a la acción.
 
-En este archivo también deberás redactar las instrucciones para que cualquiera pueda hacer funcionar tu proyecto.
+---
 
-## Consejos
+## 🧠 Mecánicas principales
 
-### Que cosas NO deberias hacer
+- **Movimiento**: El jugador puede desplazarse libremente por el mapa.
+- **Disparo**: Se genera un proyectil que avanza hasta chocar con un obstáculo o enemigo.
+- **Colisiones**:  
+  - Proyectil vs enemigo → enemigo eliminado  
+  - Proyectil vs bloque destructible → bloque destruido  
+  - Enemigo vs jugador → fin de la partida  
 
-- Investiga si lo que quieres hacer ya existe, si es así, y no se te ocurre como diferenciar tu proyecto, es mejor otra idea.
-- No te centres en una sola herramienta, prueba varias, cada una tiene sus ventajas e inconvenientes, opencode es mejor para generar código, pero gpt puede ayudarte a controlar el proceso, generar documentación y resolver dudas más generales sobre como orientar el proyecto, asi evitarás quemar tus tokens de opencode en cosas que gpt puede hacer mejor.
-- No te centres en una sola idea, prueba varias, aunque al final solo hagas una.
-- Lanzarte a lo primero que se te ocurra, es mejor tener varias opciones aunque sean similares.
-- No te centres en la complejidad, es mejor un proyecto sencillo pero bien hecho, que un proyecto complejo pero mal hecho.
-- No tienes por que hacer algo completamente nuevo, puedes coger algo que ya existe y mejorarlo, o darle una vuelta de tuerca, lo importante es que el proyecto tenga un objetivo claro y sea funcional.
+---
 
-## Librerias
+## 🗺️ Estructura del juego
 
-Algunas librerias que pueden darte ideas:
+- Mapa basado en una cuadrícula.
+- Bloques indestructibles.
+- Bloques destructibles.
+- Enemigos con movimiento automático.
+- Sistema de niveles progresivos.
 
-- [Scapy](https://scapy.net/), manipulacion de paquetes de red en python.
-- [Phaser](https://phaser.io/), engine para crear juegos en navegador.
-- [Socket.io](https://socket.io/es/), comunicacin de sockets en tiempo real para servidores http como express
-- [Threejs](https://threejs.org/), libreria para gráficos 3d en navegador
-- [ml5js](https://ml5js.org/), machine learning para navegador, diferentes modelos y usos listos para integrar
-- [p5js](https://p5js.org/), libreria para codigo creativo en 2d
+---
+
+## 🎯 Objetivo
+
+El objetivo principal del proyecto es:
+
+- Practicar programación orientada a objetos.
+- Implementar detección de colisiones.
+- Gestionar eventos en tiempo real.
+- Diseñar una mecánica alternativa a un juego clásico.
+
+---
+
+## 🚀 Posibles mejoras futuras
+
+- Sistema de munición limitada.
+- Diferentes tipos de armas.
+- Enemigos con IA más avanzada.
+- Modo multijugador.
+- Sistema de puntuación.
+- Efectos visuales y sonido.
+
+---
+
+## 🛠️ Tecnologías utilizadas
+
+*(Aquí puedes añadir el lenguaje y herramientas que hayas usado, por ejemplo: Java, C++, Python, Unity, etc.)*
+
+---
+
+## 👨‍💻 Autor
+
+Proyecto desarrollado como práctica académica inspirado en el concepto original de Bomberman, pero con mecánicas modificadas y enfoque propio.
+
+---
+
