@@ -24,6 +24,7 @@ let game = {
   player: null,
   enemies: [],
   bullets: [],
+  enemyBullets: [],
   gameOver: false,
   victory: false,
   exitOpened: false,
@@ -217,24 +218,170 @@ class Bullet {
 }
 
 class Enemy {
-  constructor(x, y) {
+  constructor(x, y, type = 'basic') {
     this.x = x;
     this.y = y;
     this.width = TILE_SIZE - 8;
     this.height = TILE_SIZE - 8;
+    this.type = type;
     this.speed = 2;
     this.direction = DIRECTIONS.DOWN;
     this.changeDirectionTimer = 0;
+    this.lastFired = 0;
+    this.teleportTimer = 0;
+    this.phaseTimer = 0;
+    
+    this.setupType(type);
+  }
+
+  setupType(type) {
+    switch(type) {
+      case 'fast':
+        this.speed = 3.5;
+        break;
+      case 'hunter':
+        this.speed = 1.8;
+        break;
+      case 'teleporter':
+        this.speed = 2;
+        this.teleportTimer = 180;
+        break;
+      case 'ghost':
+        this.speed = 2.5;
+        break;
+      case 'shooter':
+        this.speed = 1.5;
+        break;
+    }
   }
 
   update() {
+    if (this.type === 'hunter') {
+      this.hunterBehavior();
+    } else if (this.type === 'teleporter') {
+      this.teleporterBehavior();
+    } else if (this.type === 'ghost') {
+      this.ghostBehavior();
+    } else if (this.type === 'shooter') {
+      this.shooterBehavior();
+    } else {
+      this.basicBehavior();
+    }
+
+    if (this.checkCollisionWithPlayer()) {
+      endGame(false);
+    }
+  }
+
+  basicBehavior() {
     this.changeDirectionTimer++;
     if (this.changeDirectionTimer > 60 + Math.random() * 60) {
       this.changeDirectionTimer = 0;
       this.pickRandomDirection();
     }
+    this.move();
+  }
 
-    const dirs = [DIRECTIONS.UP, DIRECTIONS.DOWN, DIRECTIONS.LEFT, DIRECTIONS.RIGHT];
+  hunterBehavior() {
+    this.phaseTimer++;
+    const dx = game.player.x - this.x;
+    const dy = game.player.y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    if (dist > 0) {
+      const targetDir = {
+        x: Math.sign(dx),
+        y: Math.sign(dy)
+      };
+      
+      if (this.phaseTimer > 30) {
+        this.phaseTimer = 0;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          this.direction = targetDir.x > 0 ? DIRECTIONS.RIGHT : DIRECTIONS.LEFT;
+        } else {
+          this.direction = targetDir.y > 0 ? DIRECTIONS.DOWN : DIRECTIONS.UP;
+        }
+      }
+    }
+    this.move();
+  }
+
+  teleporterBehavior() {
+    this.changeDirectionTimer++;
+    this.teleportTimer--;
+    
+    if (this.teleportTimer <= 0) {
+      this.doTeleport();
+      this.teleportTimer = 180 + Math.random() * 120;
+    }
+    
+    if (this.changeDirectionTimer > 40 + Math.random() * 40) {
+      this.changeDirectionTimer = 0;
+      this.pickRandomDirection();
+    }
+    this.move();
+  }
+
+  doTeleport() {
+    let attempts = 0;
+    let newX, newY;
+    do {
+      newX = Math.floor(Math.random() * (COLS - 2) + 1) * TILE_SIZE;
+      newY = Math.floor(Math.random() * (ROWS - 2) + 1) * TILE_SIZE;
+      attempts++;
+    } while (this.isNearPlayer(newX, newY) || attempts < 50);
+    
+    this.x = newX;
+    this.y = newY;
+  }
+
+  isNearPlayer(x, y) {
+    const dist = Math.sqrt(Math.pow(x - game.player.x, 2) + Math.pow(y - game.player.y, 2));
+    return dist < 3 * TILE_SIZE;
+  }
+
+  ghostBehavior() {
+    this.changeDirectionTimer++;
+    if (this.changeDirectionTimer > 50 + Math.random() * 50) {
+      this.changeDirectionTimer = 0;
+      this.pickRandomDirection();
+    }
+    this.moveGhost();
+  }
+
+  shooterBehavior() {
+    this.changeDirectionTimer++;
+    this.phaseTimer++;
+    
+    if (this.phaseTimer > 90) {
+      this.shootAtPlayer();
+      this.phaseTimer = 0;
+    }
+    
+    if (this.changeDirectionTimer > 60 + Math.random() * 60) {
+      this.changeDirectionTimer = 0;
+      this.pickRandomDirection();
+    }
+    this.move();
+  }
+
+  shootAtPlayer() {
+    const centerX = this.x + TILE_SIZE / 2;
+    const centerY = this.y + TILE_SIZE / 2;
+    const playerCenterX = game.player.x + TILE_SIZE / 2;
+    const playerCenterY = game.player.y + TILE_SIZE / 2;
+    
+    const dx = playerCenterX - centerX;
+    const dy = playerCenterY - centerY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    if (dist > 0) {
+      const dir = { x: dx / dist, y: dy / dist };
+      game.enemyBullets.push(new EnemyBullet(centerX, centerY, dir));
+    }
+  }
+
+  move() {
     const newX = this.x + this.direction.x * this.speed;
     const newY = this.y + this.direction.y * this.speed;
 
@@ -244,9 +391,17 @@ class Enemy {
       this.x = newX;
       this.y = newY;
     }
+  }
 
-    if (this.checkCollisionWithPlayer()) {
-      endGame(false);
+  moveGhost() {
+    const newX = this.x + this.direction.x * this.speed;
+    const newY = this.y + this.direction.y * this.speed;
+
+    if (this.collidesGhost(newX, newY)) {
+      this.pickRandomDirection();
+    } else {
+      this.x = newX;
+      this.y = newY;
     }
   }
 
@@ -286,6 +441,37 @@ class Enemy {
     return false;
   }
 
+  collidesGhost(x, y) {
+    const padding = 4;
+    const enemyRect = {
+      x: x + padding,
+      y: y + padding,
+      width: this.width,
+      height: this.height
+    };
+
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        const tile = game.map[row][col];
+        if (tile === TILE_WALL) {
+          const tileRect = {
+            x: col * TILE_SIZE,
+            y: row * TILE_SIZE,
+            width: TILE_SIZE,
+            height: TILE_SIZE
+          };
+          if (enemyRect.x < tileRect.x + tileRect.width &&
+              enemyRect.x + enemyRect.width > tileRect.x &&
+              enemyRect.y < tileRect.y + tileRect.height &&
+              enemyRect.y + enemyRect.height > tileRect.y) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   checkCollisionWithPlayer() {
     const playerRect = {
       x: game.player.x + 4,
@@ -307,16 +493,116 @@ class Enemy {
   }
 
   draw() {
-    ctx.fillStyle = '#e94560';
-    ctx.fillRect(this.x + 4, this.y + 4, this.width, this.height);
+    const x = this.x;
+    const y = this.y;
+    const w = this.width;
+    const h = this.height;
+    
+    switch(this.type) {
+      case 'fast':
+        ctx.fillStyle = '#f9ca24';
+        ctx.fillRect(x + 4, y + 4, w, h);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x + 10, y + 10, 10, 4);
+        ctx.fillRect(x + 22, y + 10, 10, 4);
+        break;
+      case 'hunter':
+        ctx.fillStyle = '#9b59b6';
+        ctx.fillRect(x + 4, y + 4, w, h);
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath();
+        ctx.arc(x + 14, y + 16, 4, 0, Math.PI * 2);
+        ctx.arc(x + 28, y + 16, 4, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      case 'teleporter':
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect(x + 4, y + 4, w, h);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x + 8, y + 12, 8, 8);
+        ctx.fillRect(x + 24, y + 12, 8, 8);
+        if (Math.floor(this.teleportTimer / 15) % 2 === 0) {
+          ctx.strokeStyle = '#74b9ff';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x + 2, y + 2, w + 4, h + 4);
+        }
+        break;
+      case 'ghost':
+        ctx.fillStyle = 'rgba(0, 206, 201, 0.6)';
+        ctx.fillRect(x + 4, y + 4, w, h);
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(x + 16, y + 14, 5, 0, Math.PI * 2);
+        ctx.arc(x + 28, y + 14, 5, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      case 'shooter':
+        ctx.fillStyle = '#e67e22';
+        ctx.fillRect(x + 4, y + 4, w, h);
+        ctx.fillStyle = '#2c3e50';
+        ctx.beginPath();
+        ctx.moveTo(x + 12, y + 10);
+        ctx.lineTo(x + 30, y + 16);
+        ctx.lineTo(x + 12, y + 22);
+        ctx.fill();
+        break;
+      default:
+        ctx.fillStyle = '#e94560';
+        ctx.fillRect(x + 4, y + 4, w, h);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x + 10, y + 12, 8, 8);
+        ctx.fillRect(x + 24, y + 12, 8, 8);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x + 12, y + 14, 4, 4);
+        ctx.fillRect(x + 26, y + 14, 4, 4);
+    }
+  }
+}
 
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(this.x + 10, this.y + 12, 8, 8);
-    ctx.fillRect(this.x + 24, this.y + 12, 8, 8);
+class EnemyBullet {
+  constructor(x, y, direction) {
+    this.x = x;
+    this.y = y;
+    this.direction = direction;
+    this.speed = 5;
+    this.radius = 5;
+    this.active = true;
+  }
 
-    ctx.fillStyle = '#000';
-    ctx.fillRect(this.x + 12, this.y + 14, 4, 4);
-    ctx.fillRect(this.x + 26, this.y + 14, 4, 4);
+  update() {
+    this.x += this.direction.x * this.speed;
+    this.y += this.direction.y * this.speed;
+
+    if (this.x < 0 || this.x > canvas.width ||
+        this.y < 0 || this.y > canvas.height) {
+      this.active = false;
+      return;
+    }
+
+    const col = Math.floor(this.x / TILE_SIZE);
+    const row = Math.floor(this.y / TILE_SIZE);
+
+    if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+      const tile = game.map[row][col];
+      if (tile === TILE_WALL || tile === TILE_BRICK) {
+        this.active = false;
+      }
+    }
+
+    const playerCenterX = game.player.x + TILE_SIZE / 2;
+    const playerCenterY = game.player.y + TILE_SIZE / 2;
+    const dist = Math.sqrt(Math.pow(this.x - playerCenterX, 2) + Math.pow(this.y - playerCenterY, 2));
+    if (dist < 20) {
+      endGame(false);
+    }
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff6b6b';
+    ctx.fill();
+    ctx.closePath();
   }
 }
 
@@ -347,6 +633,13 @@ function spawnEnemies() {
   game.enemies = [];
   const numEnemies = Math.min(2 + game.level, 8);
 
+  const enemyTypes = ['basic'];
+  if (game.level >= 2) enemyTypes.push('fast');
+  if (game.level >= 3) enemyTypes.push('hunter');
+  if (game.level >= 4) enemyTypes.push('teleporter');
+  if (game.level >= 5) enemyTypes.push('ghost');
+  if (game.level >= 6) enemyTypes.push('shooter');
+
   for (let i = 0; i < numEnemies; i++) {
     let x, y;
     let attempts = 0;
@@ -358,7 +651,8 @@ function spawnEnemies() {
              game.map[Math.floor(y / TILE_SIZE)][Math.floor(x / TILE_SIZE)] !== TILE_EMPTY ||
              attempts < 100);
 
-    game.enemies.push(new Enemy(x, y));
+    const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+    game.enemies.push(new Enemy(x, y, type));
   }
 }
 
@@ -400,6 +694,7 @@ function initGame(resetUpgrades = false) {
   }
   
   game.bullets = [];
+  game.enemyBullets = [];
   game.gameOver = false;
   game.victory = false;
   game.exitOpened = false;
@@ -475,6 +770,9 @@ function update() {
   game.bullets.forEach(bullet => bullet.update());
   game.bullets = game.bullets.filter(b => b.active);
 
+  game.enemyBullets.forEach(bullet => bullet.update());
+  game.enemyBullets = game.enemyBullets.filter(b => b.active);
+
   game.enemies.forEach(enemy => enemy.update());
 
   for (let i = game.bullets.length - 1; i >= 0; i--) {
@@ -532,6 +830,7 @@ function draw() {
   drawMap();
 
   game.bullets.forEach(bullet => bullet.draw());
+  game.enemyBullets.forEach(bullet => bullet.draw());
   game.enemies.forEach(enemy => enemy.draw());
   game.player.draw();
 }
